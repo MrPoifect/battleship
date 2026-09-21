@@ -1,26 +1,80 @@
 import { Ship, Gameboard } from './battleship';
 
 test('Ship Hit Test', () => {
-  const shipA = Ship(4);
-  expect(shipA.hit()).toBe(1);
-  expect(shipA.hit()).toBe(2);
+  const ship = Ship(4);
+  expect(ship.hit()).toBe(1);
+  expect(ship.hit()).toBe(2);
 });
 
 test('Shink sink Test', () => {
-  const shipB = Ship(4);
-  shipB.hit();
-  shipB.hit();
-  shipB.hit();
-  expect(shipB.isSunk()).toBe(false);
-  shipB.hit();
-  expect(shipB.isSunk()).toBe(true);
+  const ship = Ship(4);
+  ship.hit();
+  ship.hit();
+  ship.hit();
+  expect(ship.isSunk()).toBe(false);
+  ship.hit();
+  expect(ship.isSunk()).toBe(true);
 });
 
+test('Board place horizontal Test', () => {
+  const ship = Ship(4);
+  const board = Gameboard();
 
-test("Board place horizontal Test", () => {
-    const shipC = Ship(4);
-    const boardA = Gameboard();
+  board.placeShip(ship, 0, 0, 'horizontal');
 
-    boardA.placeShip(shipC, 0,0, "horizontal");
-    expect(boardA.board[0][0]).toBe(shipC);
-})
+  for (let y = 0; y < 10; y++) {
+    for (let x = 0; x < 10; x++) {
+      if (y === 0 && x >= 0 && x <= 3) {
+        expect(board.board[y][x]).toBe(ship);
+      } else {
+        expect(board.board[y][x]).toBe(null);
+      }
+    }
+  }
+});
+
+test('Board place vertical Test', () => {
+  const ship = Ship(4);
+  const board = Gameboard();
+
+  board.placeShip(ship, 0, 0, 'vertical');
+
+  for (let y = 0; y < 10; y++) {
+    for (let x = 0; x < 10; x++) {
+      if (x === 0 && y >= 0 && y <= 3) {
+        expect(board.board[y][x]).toBe(ship);
+      } else {
+        expect(board.board[y][x]).toBe(null);
+      }
+    }
+  }
+});
+
+test('attacking target test', () => {
+  const ship = Ship(4);
+  const board = Gameboard();
+
+  board.placeShip(ship, 0, 0, 'horizontal');
+
+  expect(board.board[0][0]).toBe(ship);
+
+  expect(ship.getHitCount()).toBe(0);
+  board.recieveAttack(0, 0);
+  expect(ship.getHitCount()).toBe(1);
+  board.recieveAttack(0, 0);
+  expect(ship.getHitCount()).toBe(1);
+
+  board.recieveAttack(1, 0);
+  expect(ship.getHitCount()).toBe(2);
+  board.recieveAttack(1, 1);
+  expect(ship.getHitCount()).toBe(2);
+
+  board.recieveAttack(2, 0);
+  board.recieveAttack(9, 9);
+  expect(ship.getHitCount()).toBe(3);
+  expect(ship.isSunk()).toBe(false);
+
+  board.recieveAttack(3, 0);
+  expect(ship.getHitCount()).toBe(4);
+  expect(ship.isSunk()).toBe(true);
+});
