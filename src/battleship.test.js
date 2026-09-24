@@ -78,3 +78,26 @@ test('attacking target test', () => {
   expect(ship.getHitCount()).toBe(4);
   expect(ship.isSunk()).toBe(true);
 });
+
+test('Game over test', () => {
+  const shipA = Ship(4);
+  const shipB = Ship(2);
+  const board = Gameboard();
+
+  board.placeShip(shipA, 0, 0, 'horizontal');
+  board.placeShip(shipB, 0, 1, 'horizontal');
+
+  expect(board.checkGameOver()).toBe(false);
+
+  board.recieveAttack(0, 0);
+  board.recieveAttack(1, 0);
+  board.recieveAttack(2, 0);
+  board.recieveAttack(3, 0);
+
+  expect(board.checkGameOver()).toBe(false);
+
+  board.recieveAttack(0, 1);
+  board.recieveAttack(1, 1);
+
+  expect(board.checkGameOver()).toBe(true);
+});
