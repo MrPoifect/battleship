@@ -1,5 +1,5 @@
 export { Gameboard };
-import { markCell } from "./dom.js";
+import { markCell } from './dom.js';
 
 function Gameboard() {
   const board = Array(10)
@@ -7,7 +7,6 @@ function Gameboard() {
     .map(() => Array(10).fill(null));
 
   const placedShips = [];
-  const missedCells = [];
 
   const placeShip = (ship, x, y, direction) => {
     const length = ship.getLength();
@@ -17,10 +16,10 @@ function Gameboard() {
         let newX = x + i;
         if (board[newY][newX] == null) {
           board[newY][newX] = ship;
-          placedShips.push(ship);
         } else {
-            return "Can't Place Ship";
+          return "Can't Place Ship";
         }
+        placedShips.push(ship);
       }
     }
     if (direction === 'y') {
@@ -29,10 +28,10 @@ function Gameboard() {
         let newY = y + i;
         if (board[newY][newX] == null) {
           board[newY][newX] = ship;
-          placedShips.push(ship);
         } else {
           return "Can't Place Ship";
         }
+        placedShips.push(ship);
       }
     }
   };
@@ -40,17 +39,17 @@ function Gameboard() {
   const recieveAttack = (x, y, cell) => {
     const target = board[y][x];
     if (target === 'miss' || target === 'hit') {
-      console.log("Can't place")
+      console.log("Can't place");
       return;
     }
 
     if (target != null) {
       target.hit();
       board[y][x] = 'hit';
-            markCell(cell, "hit")
+      markCell(cell, 'hit');
     } else {
       board[y][x] = 'miss';
-            markCell(cell, "miss")
+      markCell(cell, 'miss');
       return;
     }
   };
