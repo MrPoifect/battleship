@@ -1,24 +1,4 @@
-export { Ship, Gameboard };
-
-function Ship(length) {
-  const shipLength = length;
-  let hitCount = 0;
-
-  const hit = () => {
-    hitCount += 1;
-    return hitCount;
-  };
-
-  const isSunk = () => {
-    return hitCount >= shipLength;
-  };
-
-  const getHitCount = () => {
-    return hitCount;
-  };
-
-  return { hit, isSunk, getLength: () => shipLength, getHitCount };
-}
+export { Gameboard };
 
 function Gameboard() {
   const board = Array(10)
@@ -26,23 +6,32 @@ function Gameboard() {
     .map(() => Array(10).fill(null));
 
   const placedShips = [];
+  const missedCells = [];
 
   const placeShip = (ship, x, y, direction) => {
     const length = ship.getLength();
-    if (direction === 'horizontal') {
+    if (direction === 'x') {
       const newY = y;
       for (let i = 0; i < length; i++) {
         let newX = x + i;
-        board[newY][newX] = ship;
-        placedShips.push(ship);
+        if (board[newY][newX] == null) {
+          board[newY][newX] = ship;
+          placedShips.push(ship);
+        } else {
+            return "Can't Place Ship";
+        }
       }
     }
-    if (direction === 'vertical') {
+    if (direction === 'y') {
       const newX = x;
       for (let i = 0; i < length; i++) {
         let newY = y + i;
-        board[newY][newX] = ship;
-        placedShips.push(ship);
+        if (board[newY][newX] == null) {
+          board[newY][newX] = ship;
+          placedShips.push(ship);
+        } else {
+          return "Can't Place Ship";
+        }
       }
     }
   };
@@ -69,16 +58,12 @@ function Gameboard() {
         return false;
       } else {
         deadShipCount++;
-        if (deadShipCount === placedShips.length){
-            return true;
+        if (deadShipCount === placedShips.length) {
+          return true;
         }
       }
     }
   };
 
   return { placeShip, board, recieveAttack, checkGameOver };
-}
-
-function Player() {
-  const playerBoard = Gameboard();
 }

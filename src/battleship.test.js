@@ -1,4 +1,6 @@
-import { Ship, Gameboard } from './battleship';
+import { Ship } from './ship.js';
+import { Gameboard } from './gameboard.js';
+import { Player } from './player.js';
 
 test('Ship Hit Test', () => {
   const ship = Ship(4);
@@ -16,11 +18,11 @@ test('Shink sink Test', () => {
   expect(ship.isSunk()).toBe(true);
 });
 
-test('Board place horizontal Test', () => {
+test('Board place x Test', () => {
   const ship = Ship(4);
   const board = Gameboard();
 
-  board.placeShip(ship, 0, 0, 'horizontal');
+  board.placeShip(ship, 0, 0, 'x');
 
   for (let y = 0; y < 10; y++) {
     for (let x = 0; x < 10; x++) {
@@ -33,11 +35,11 @@ test('Board place horizontal Test', () => {
   }
 });
 
-test('Board place vertical Test', () => {
+test('Board place y Test', () => {
   const ship = Ship(4);
   const board = Gameboard();
 
-  board.placeShip(ship, 0, 0, 'vertical');
+  board.placeShip(ship, 0, 0, 'y');
 
   for (let y = 0; y < 10; y++) {
     for (let x = 0; x < 10; x++) {
@@ -54,7 +56,7 @@ test('attacking target test', () => {
   const ship = Ship(4);
   const board = Gameboard();
 
-  board.placeShip(ship, 0, 0, 'horizontal');
+  board.placeShip(ship, 0, 0, 'x');
 
   expect(board.board[0][0]).toBe(ship);
 
@@ -84,8 +86,8 @@ test('Game over test', () => {
   const shipB = Ship(2);
   const board = Gameboard();
 
-  board.placeShip(shipA, 0, 0, 'horizontal');
-  board.placeShip(shipB, 0, 1, 'horizontal');
+  board.placeShip(shipA, 0, 0, 'x');
+  board.placeShip(shipB, 0, 1, 'x');
 
   expect(board.checkGameOver()).toBe(false);
 
@@ -101,3 +103,14 @@ test('Game over test', () => {
 
   expect(board.checkGameOver()).toBe(true);
 });
+
+test("Place in taken spot", () => {
+  const ShipA = Ship(4);
+  const ShipB = Ship(4);
+  const board= Gameboard();
+
+  board.placeShip(ShipA, 0,0, "x");
+
+  expect(board.placeShip(ShipB, 0,0, "y")).toBe("Can't Place Ship")
+
+})
