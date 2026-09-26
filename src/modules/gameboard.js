@@ -1,4 +1,5 @@
 export { Gameboard };
+import { markCell } from "./dom.js";
 
 function Gameboard() {
   const board = Array(10)
@@ -36,18 +37,21 @@ function Gameboard() {
     }
   };
 
-  const recieveAttack = (x, y) => {
+  const recieveAttack = (x, y, cell) => {
     const target = board[y][x];
     if (target === 'miss' || target === 'hit') {
+      console.log("Can't place")
       return;
     }
 
     if (target != null) {
       target.hit();
       board[y][x] = 'hit';
+            markCell(cell, "hit")
     } else {
       board[y][x] = 'miss';
-      return (x, y);
+            markCell(cell, "miss")
+      return;
     }
   };
 

@@ -1,6 +1,6 @@
-import { Ship } from './ship.js';
-import { Gameboard } from './gameboard.js';
-import { Player } from './player.js';
+import { Ship } from './modules/ship.js';
+import { Gameboard } from './modules/gameboard.js';
+import { Player } from './modules/player.js';
 
 test('Ship Hit Test', () => {
   const ship = Ship(4);
