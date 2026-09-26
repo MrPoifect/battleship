@@ -11,10 +11,13 @@ function Gameplay() {
   function newGame() {
     playerOne = Player('TestP1');
     placeTempShips(playerOne);
-    
+
     playerTwo = Player('TestP2');
     placeTempShips2(playerTwo);
+    renderBoards();
+  }
 
+  function renderBoards() {
     renderGameBoard(playerOne);
     renderTargetBoard(playerOne, playerTwo);
 
@@ -36,5 +39,5 @@ function Gameplay() {
     player.board.placeShip(shipB, 4, 2, 'y');
   }
 
-  return { newGame };
+  return { newGame, renderBoards };
 }

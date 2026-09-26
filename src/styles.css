@@ -63,3 +63,12 @@
 }
 
 .ship {background-color: black;}
+
+.hit {
+    background-color: brown;
+}
+
+.hit:hover {
+    background-color: rgb(124, 34, 34);
+}
+

@@ -1,5 +1,4 @@
 export { Gameboard };
-import { markCell } from './dom.js';
 
 function Gameboard() {
   const board = Array(10)
@@ -10,33 +9,32 @@ function Gameboard() {
 
   const placeShip = (ship, x, y, direction) => {
     const length = ship.getLength();
-    if (direction === 'x') {
-      const newY = y;
-      for (let i = 0; i < length; i++) {
-        let newX = x + i;
-        if (board[newY][newX] == null) {
-          board[newY][newX] = ship;
-        } else {
-          return "Can't Place Ship";
-        }
-        placedShips.push(ship);
+    for (let i = 0; i < length; i++) {
+      const newX = direction === 'x' ? x + i : x;
+      const newY = direction === 'y' ? y + i : y;
+
+      if (
+        newX < 0 ||
+        newX >= 10 ||
+        newY < 0 ||
+        newY >= 10 ||
+        board[newY][newX] != null
+      ) {
+        return "Can't Place Ship";
       }
     }
-    if (direction === 'y') {
-      const newX = x;
-      for (let i = 0; i < length; i++) {
-        let newY = y + i;
-        if (board[newY][newX] == null) {
-          board[newY][newX] = ship;
-        } else {
-          return "Can't Place Ship";
-        }
-        placedShips.push(ship);
-      }
+
+    for (let i = 0; i < length; i++) {
+      const newX = direction === 'x' ? x + i : x;
+      const newY = direction === 'y' ? y + i : y;
+
+      board[newY][newX] = ship;
     }
+
+    placedShips.push(ship);
   };
 
-  const recieveAttack = (x, y, cell) => {
+  const recieveAttack = (x, y) => {
     const target = board[y][x];
     if (target === 'miss' || target === 'hit') {
       console.log("Can't place");
@@ -46,11 +44,11 @@ function Gameboard() {
     if (target != null) {
       target.hit();
       board[y][x] = 'hit';
-      markCell(cell, 'hit');
+
+      return 'hit';
     } else {
       board[y][x] = 'miss';
-      markCell(cell, 'miss');
-      return;
+      return 'miss';
     }
   };
 

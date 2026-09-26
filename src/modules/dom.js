@@ -9,17 +9,19 @@ const gameArea = document.getElementById('game-area');
 function renderGameBoard(player) {
   const board = document.createElement('div');
   board.classList.add('board');
+  player.domCells = [];
   gameArea.appendChild(board);
 
+  // Add Player name to top of board
   const namePlate = document.createElement('div');
   namePlate.classList.add('name-plate');
   board.appendChild(namePlate);
-
   const nameText = document.createElement('p');
   nameText.classList.add('name-text');
-  nameText.textContent = player.name + " ships";
+  nameText.textContent = player.name + ' ships';
   namePlate.appendChild(nameText);
 
+  //create Grid
   const gridArea = document.createElement('div');
   gridArea.classList.add('grid-area');
   board.appendChild(gridArea);
@@ -28,12 +30,31 @@ function renderGameBoard(player) {
     const row = document.createElement('div');
     row.classList.add('row');
     gridArea.append(row);
+    player.domCells[y] = [];
+
+    //Loop withing parent to create each Cell
     for (let x = 0; x < 10; x++) {
       const cell = document.createElement('div');
       cell.classList.add('cell', 'column');
+      cell.dataset.x = x;
+      cell.dataset.y = y;
+      player.domCells[y][x] = cell;
       row.appendChild(cell);
-      if (player.board.board[y][x] !== null){
-        cell.classList.add("ship");
+
+      if (player.board.board[y][x] === 'hit') {
+        cell.classList.add('hit');
+      }
+
+      if (player.board.board[y][x] === 'miss') {
+        cell.classList.add('miss');
+      }
+
+      if (
+        player.board.board[y][x] !== null &&
+        player.board.board[y][x] !== 'hit' &&
+        player.board.board[y][x] !== 'miss'
+      ) {
+        cell.classList.add('ship');
       }
     }
   }
@@ -45,12 +66,12 @@ function renderTargetBoard(owningPlayer, targetPlayer) {
   gameArea.appendChild(board);
 
   const namePlate = document.createElement('div');
-  namePlate.classList.add('name-plate', "target");
+  namePlate.classList.add('name-plate', 'target');
   board.appendChild(namePlate);
 
   const nameText = document.createElement('p');
   nameText.classList.add('name-text');
-  nameText.textContent = (owningPlayer.name + "Targets");
+  nameText.textContent = owningPlayer.name + 'Targets';
   namePlate.appendChild(nameText);
 
   const gridArea = document.createElement('div');
@@ -61,12 +82,16 @@ function renderTargetBoard(owningPlayer, targetPlayer) {
     const row = document.createElement('div');
     row.classList.add('row');
     gridArea.append(row);
+
     for (let x = 0; x < 10; x++) {
       const cell = document.createElement('div');
       cell.classList.add('cell', 'column');
       row.appendChild(cell);
       cell.addEventListener('click', () => {
-        targetPlayer.board.recieveAttack(x, y, cell);
+        const result = targetPlayer.board.recieveAttack(x, y, cell);
+        markCell(cell, result);
+        const targetCell = targetPlayer.domCells[y][x];
+        markCell(targetCell, result);
       });
     }
   }
@@ -80,8 +105,4 @@ function markCell(cell, hitType) {
     case 'miss':
       cell.classList.add('miss');
   }
-}
-
-function markShipCells(){
-
 }
