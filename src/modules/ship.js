@@ -16,6 +16,10 @@ function Ship(length) {
   const getHitCount = () => {
     return hitCount;
   };
+  
+  const getLength = () => {
+    return shipLength
+  }
 
-  return { hit, isSunk, getLength: () => shipLength, getHitCount };
+  return { hit, isSunk, getLength, getHitCount };
 }

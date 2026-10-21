@@ -20,7 +20,8 @@ function Gameboard() {
         newY >= 10 ||
         board[newY][newX] != null
       ) {
-        return "Can't Place Ship";
+        console.log("invalid placement")
+        return false;
       }
     }
 
@@ -32,9 +33,10 @@ function Gameboard() {
     }
 
     placedShips.push(ship);
+    return true;
   };
 
-  const recieveAttack = (x, y) => {
+  const receiveAttack = (x, y) => {
     const target = board[y][x];
     if (target === 'miss' || target === 'hit') {
       console.log("Can't place");
@@ -44,7 +46,7 @@ function Gameboard() {
     if (target != null) {
       target.hit();
       board[y][x] = 'hit';
-
+      checkGameOver();
       return 'hit';
     } else {
       board[y][x] = 'miss';
@@ -59,12 +61,13 @@ function Gameboard() {
         return false;
       } else {
         deadShipCount++;
-        if (deadShipCount === placedShips.length) {
+        if (deadShipCount >= placedShips.length) {
+          console.log("Gameover")
           return true;
         }
       }
     }
   };
 
-  return { placeShip, board, recieveAttack, checkGameOver };
+  return { placeShip, board, receiveAttack, checkGameOver };
 }

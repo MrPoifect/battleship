@@ -1,108 +1,72 @@
 import { Ship } from './ship.js';
 import { Gameboard } from './gameboard.js';
 import { Player } from './player.js';
+import { Gameplay } from './gameplay.js';
 
-export { renderGameBoard, markCell, renderTargetBoard };
+export { renderPlayerBoard, renderTargetBoard, createGameArea };
 
-const gameArea = document.getElementById('game-area');
 
-function renderGameBoard(player) {
-  const board = document.createElement('div');
-  board.classList.add('board');
-  player.domCells = [];
-  gameArea.appendChild(board);
+function createGameArea(onSwapPlayer) {
+  const boardArea = document.createElement('div');
+  boardArea.id = 'game-area';
+  const targetBoard = document.createElement('div');
+  targetBoard.id = 'target-board';
+  const playerBoard = document.createElement('div');
+  playerBoard.id = 'player-board';
 
-  // Add Player name to top of board
-  const namePlate = document.createElement('div');
-  namePlate.classList.add('name-plate');
-  board.appendChild(namePlate);
-  const nameText = document.createElement('p');
-  nameText.classList.add('name-text');
-  nameText.textContent = player.name + ' ships';
-  namePlate.appendChild(nameText);
+  document.body.appendChild(boardArea);
 
-  //create Grid
-  const gridArea = document.createElement('div');
-  gridArea.classList.add('grid-area');
-  board.appendChild(gridArea);
+  boardArea.append(targetBoard, playerBoard)
+
+  const testPlayerSwitch = document.createElement("button");
+  testPlayerSwitch.textContent = "Swap Player"
+  testPlayerSwitch.addEventListener("click", onSwapPlayer);
+
+  boardArea.appendChild(testPlayerSwitch)
+}
+
+function renderBoard(player, container, hideShips = false, onCellClick = null) {
+  const board = player.board.board;
+
+  container.replaceChildren();
+  container.classList.add('game-board');
 
   for (let y = 0; y < 10; y++) {
-    const row = document.createElement('div');
-    row.classList.add('row');
-    gridArea.append(row);
-    player.domCells[y] = [];
-
-    //Loop withing parent to create each Cell
     for (let x = 0; x < 10; x++) {
+      const cellState = board[y][x];
       const cell = document.createElement('div');
-      cell.classList.add('cell', 'column');
+
+      cell.classList.add('cell');
+
+      // Store coordinates for later click handling.
       cell.dataset.x = x;
       cell.dataset.y = y;
-      player.domCells[y][x] = cell;
-      row.appendChild(cell);
 
-      if (player.board.board[y][x] === 'hit') {
+      if (cellState === 'hit') {
         cell.classList.add('hit');
-      }
-
-      if (player.board.board[y][x] === 'miss') {
+      } else if (cellState === 'miss') {
         cell.classList.add('miss');
-      }
-
-      if (
-        player.board.board[y][x] !== null &&
-        player.board.board[y][x] !== 'hit' &&
-        player.board.board[y][x] !== 'miss'
-      ) {
+      } else if (cellState !== null && !hideShips) {
         cell.classList.add('ship');
       }
+
+      if (onCellClick){
+        cell.addEventListener("click", () => onCellClick(x,y))
+      }
+
+      container.appendChild(cell);
     }
   }
 }
 
-function renderTargetBoard(owningPlayer, targetPlayer) {
-  const board = document.createElement('div');
-  board.classList.add('board', 'target');
-  gameArea.appendChild(board);
+function renderPlayerBoard(player) {
+  const container = document.querySelector('#player-board');
 
-  const namePlate = document.createElement('div');
-  namePlate.classList.add('name-plate', 'target');
-  board.appendChild(namePlate);
-
-  const nameText = document.createElement('p');
-  nameText.classList.add('name-text');
-  nameText.textContent = owningPlayer.name + 'Targets';
-  namePlate.appendChild(nameText);
-
-  const gridArea = document.createElement('div');
-  gridArea.classList.add('grid-area');
-  board.appendChild(gridArea);
-
-  for (let y = 0; y < 10; y++) {
-    const row = document.createElement('div');
-    row.classList.add('row');
-    gridArea.append(row);
-
-    for (let x = 0; x < 10; x++) {
-      const cell = document.createElement('div');
-      cell.classList.add('cell', 'column');
-      row.appendChild(cell);
-      cell.addEventListener('click', () => {
-        const result = targetPlayer.board.recieveAttack(x, y, cell);
-        markCell(cell, result);
-        const targetCell = targetPlayer.domCells[y][x];
-        markCell(targetCell, result);
-      });
-    }
-  }
+  renderBoard(player, container, false);
 }
 
-function markCell(cell, hitType) {
-  switch (hitType) {
-    case 'hit':
-      cell.classList.add('hit');
-      break;
-    case 'miss':
-      cell.classList.add('miss');
-  }
+function renderTargetBoard(player, targetPlayer, onCellClick) {
+  const container = document.querySelector('#target-board');
+
+  renderBoard(targetPlayer, container, true, onCellClick);
 }

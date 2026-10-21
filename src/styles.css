@@ -1,74 +1,34 @@
-#game-area {
-  background-color: rgb(70, 70, 70);
-  width: 95vw;
-  height: 95vh;
-  margin: auto;
-  display: flex;
-  flex-direction: row;
-}
 
-.board {
-  background-color: aliceblue;
-  display: flex;
-  flex-direction: column;
-  width: 50%;
-  margin: 8px;
-}
-
-.name-plate {
-  background-color: rgb(119, 117, 114);
-  height: 60px;
-}
-
-.name-text {
-  font-size: 25px;
-  text-align: center;
-}
-
-.grid-area {
-  background-color: green;
-  padding: 6px;
+.game-board {
+  display: grid;
+  grid-template-columns: repeat(10, 40px);
+  grid-template-rows: repeat(10, 40px);
+  gap: 2px;
+  width: max-content;
+  margin-bottom: 25px
 }
 
 .cell {
-  background-color: rgb(31, 73, 100);
-  width: 10%;
-  aspect-ratio: 1/1;
-  margin: 1px;
+  width: 40px;
+  height: 40px;
+  box-sizing: border-box;
   border-radius: 4px;
-}
-
-.cell:hover{
-  background-color: rgb(28, 64, 87);
-}
-
-.row {
+  background-color: #354953;
   display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: bold;
+  font-size: 20px;
 }
 
-.hit {
-    background-color: brown;
+.cell.ship {
+  background-color: #3a3a3a;
 }
 
-.hit:hover {
-    background-color: rgb(124, 34, 34);
+.cell.hit {
+  background-color: #aa3829;
 }
 
-.miss {
-    background-color: aliceblue;
+.cell.miss {
+  background-color: #d8e3e9;
 }
-
-.miss:hover {
-    background-color: rgb(189, 195, 201);
-}
-
-.ship {background-color: black;}
-
-.hit {
-    background-color: brown;
-}
-
-.hit:hover {
-    background-color: rgb(124, 34, 34);
-}
-
