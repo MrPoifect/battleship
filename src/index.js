@@ -1,19 +1,21 @@
-import "./styles.css"
+import './styles.css';
 
-import { Gameplay } from "./modules/gameplay.js"
+import { Gameplay } from './modules/gameplay.js';
 
-import { createMainMenu } from "./modules/dom.js";
+import { createMainMenu, createPlayerInputs } from './modules/dom.js';
+
+export { startPvpGame };
 
 function startPvpGame(p1name, p2name) {
-    const game = Gameplay();
-    game.newPvpGame(p1name, p2name);
+  const game = Gameplay();
+  game.newPvpGame(p1name, p2name);
 }
 
 function startPveGame(p1name) {
-    const game = Gameplay();
-    game.newPveGame();
+  const game = Gameplay();
+  game.newPveGame();
 }
 
-//createMainMenu();
+createMainMenu();
 
-startPvpGame("Joe", "Charlotte");
+// startPvpGame("Joe", "Charlotte");

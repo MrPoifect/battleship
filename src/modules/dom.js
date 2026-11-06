@@ -2,6 +2,7 @@ import { Ship } from './ship.js';
 import { Gameboard } from './gameboard.js';
 import { Player } from './player.js';
 import { Gameplay } from './gameplay.js';
+import { startPvpGame } from '../index.js';
 
 export {
   renderPlayerBoard,
@@ -10,7 +11,8 @@ export {
   createMainMenu,
   createGameOverModal,
   createTurnOverModal,
-  calculateCellName
+  calculateCellName,
+  createPlayerInputs
 };
 
 function createGameArea(onSwapPlayer) {
@@ -25,18 +27,52 @@ function createGameArea(onSwapPlayer) {
 
   boardArea.append(targetBoard, playerBoard);
 
-  const testPlayerSwitch = document.createElement('button');
-  testPlayerSwitch.textContent = 'Swap Player';
-  testPlayerSwitch.addEventListener('click', onSwapPlayer);
+  // const testPlayerSwitch = document.createElement('button');
+  // testPlayerSwitch.textContent = 'Swap Player';
+  // testPlayerSwitch.addEventListener('click', onSwapPlayer);
 
-  boardArea.appendChild(testPlayerSwitch);
+  // boardArea.appendChild(testPlayerSwitch);
+}
+
+function createBoardLabels(container) {
+  const letters = 'ABCDEFGHIJ'.split('');
+
+  const columnLabels = document.createElement('div');
+  columnLabels.classList.add('column-labels');
+
+  letters.forEach(letter => {
+    const label = document.createElement('div');
+    label.textContent = letter;
+    columnLabels.appendChild(label);
+  });
+
+  const rowLabels = document.createElement('div');
+  rowLabels.classList.add('row-labels');
+
+  for (let i = 1; i <= 10; i++) {
+    const label = document.createElement('div');
+    label.textContent = i;
+    rowLabels.appendChild(label);
+  }
+
+  container.append(columnLabels, rowLabels);
 }
 
 function renderBoard(player, container, hideShips = false, onCellClick = null) {
   const board = player.board.board;
 
   container.replaceChildren();
-  container.classList.add('game-board');
+
+  // Create wrapper
+  const boardContainer = document.createElement('div');
+  boardContainer.classList.add('board-container');
+
+  // Create actual game board
+  const boardElement = document.createElement('div');
+  boardElement.classList.add('game-board');
+
+  // Generate labels inside wrapper
+  createBoardLabels(boardContainer);
 
   for (let y = 0; y < 10; y++) {
     for (let x = 0; x < 10; x++) {
@@ -45,7 +81,6 @@ function renderBoard(player, container, hideShips = false, onCellClick = null) {
 
       cell.classList.add('cell');
 
-      // Store coordinates for later click handling.
       cell.dataset.x = x;
       cell.dataset.y = y;
 
@@ -61,9 +96,13 @@ function renderBoard(player, container, hideShips = false, onCellClick = null) {
         cell.addEventListener('click', () => onCellClick(x, y));
       }
 
-      container.appendChild(cell);
+      boardElement.appendChild(cell);
     }
   }
+
+  // Append board and wrapper
+  boardContainer.appendChild(boardElement);
+  container.appendChild(boardContainer);
 }
 
 function renderPlayerBoard(player) {
@@ -101,6 +140,7 @@ function renderEmptyBoard(container) {
 }
 
 function createMainMenu() {
+  document.body.innerHTML = '';
   const menu = document.createElement('div');
   menu.id = 'main-menu';
   const menuButtons = document.createElement('div');
@@ -118,22 +158,104 @@ function createMainMenu() {
   menu.appendChild(menuButtons);
   menuButtons.appendChild(pvpBtn);
   menuButtons.appendChild(pveBtn);
+
+  pvpBtn.addEventListener('click', () => {
+    createPlayerInputs();
+  });
 }
 
-function createGameOverModal(currentPlayer) {
-  const gameOverModal = document.createElement('dialog');
-  gameOverModal.id = 'game-over';
-  gameOverModal.classList.add('modal');
-  const gameOverText = document.createElement('p');
-  gameOverText.textContent = 'Game Over';
-  const mainMenuButton = document.createElement('button');
-  mainMenuButton.textContent = 'Main Menu';
+function createPlayerInputs() {
+  document.body.innerHTML = '';
+  const modal = document.createElement('dialog');
+  modal.id = 'start-modal';
+  modal.classList.add('modal');
 
-  gameOverModal.appendChild(gameOverText);
-  gameOverModal.appendChild(mainMenuButton);
+  const modalContent = document.createElement('div');
+  modalContent.classList.add('modal-content');
+
+  const title = document.createElement('h2');
+  title.textContent = 'Battleship';
+
+  const playerOneLabel = document.createElement('label');
+  playerOneLabel.textContent = 'Player 1 Name';
+
+  const playerOneInput = document.createElement('input');
+  playerOneInput.type = 'text';
+  playerOneInput.placeholder = 'Enter player 1 name';
+  playerOneInput.maxLength = 15;
+  playerOneInput.required = true;
+
+  const playerTwoLabel = document.createElement('label');
+  playerTwoLabel.textContent = 'Player 2 Name';
+
+  const playerTwoInput = document.createElement('input');
+  playerTwoInput.type = 'text';
+  playerTwoInput.placeholder = 'Enter player 2 name';
+  playerTwoInput.maxLength = 15;
+  playerTwoInput.required = true;
+
+  const startButton = document.createElement('button');
+  startButton.textContent = 'Start Game';
+
+  startButton.addEventListener('click', () => {
+    const playerOneName = playerOneInput.value.trim();
+    const playerTwoName = playerTwoInput.value.trim();
+
+    if (!playerOneName || !playerTwoName) {
+      alert('Both players must enter a name!');
+      return;
+    }
+
+    modal.close();
+    startPvpGame(playerOneName, playerTwoName);
+    modal.remove();
+  });
+
+  modalContent.append(
+    title,
+    playerOneLabel,
+    playerOneInput,
+    playerTwoLabel,
+    playerTwoInput,
+    startButton
+  );
+
+  modal.appendChild(modalContent);
+  document.body.appendChild(modal);
+
+  modal.showModal();
 }
 
-function createTurnOverModal(currentPlayer, result) {
+function createGameOverModal(currentPlayer, opponent) {
+  const modal = document.createElement('dialog');
+  modal.id = 'game-over';
+  modal.classList.add('modal');
+  const modalContent = document.createElement('div');
+  modalContent.classList.add('modal-content');
+  const title = document.createElement('p');
+  title.id = 'title';
+  const subText = document.createElement('p');
+
+  title.textContent = 'GAME OVER';
+  subText.textContent = `${currentPlayer.name} Wins!`;
+
+  const mainMenuBtn = document.createElement('button');
+  mainMenuBtn.textContent = 'Main Menu';
+
+  mainMenuBtn.addEventListener('click', () => {
+    modal.close();
+    modal.remove();
+    createMainMenu();
+  });
+
+  document.body.appendChild(modal);
+  modal.appendChild(modalContent);
+  modalContent.append(title, subText, mainMenuBtn);
+  modal.showModal();
+}
+
+
+function createTurnOverModal(currentPlayer, result, opponent, onSwapPlayer) {
   const modal = document.createElement('dialog');
   modal.id = 'turn-over';
   modal.classList.add('modal');
@@ -143,23 +265,42 @@ function createTurnOverModal(currentPlayer, result) {
   title.id = result.result;
   const subText = document.createElement('p');
 
+  const nextTurnBtn = document.createElement('button');
+  nextTurnBtn.textContent = `Begin ${opponent.name}'s turn`;
+
+  nextTurnBtn.addEventListener('click', () => {
+    modal.close();
+    modal.remove();
+    onSwapPlayer();
+  });
+
   document.body.appendChild(modal);
   modal.appendChild(modalContent);
   modalContent.append(title, subText);
+  modalContent.append(nextTurnBtn);
   renderTransitionBoards();
+
+  switch (result.result) {
+    case 'hit':
+      title.textContent = 'Hit!';
+      break;
+
+    case 'miss':
+      title.textContent = 'Miss..';
+  }
 
   subText.textContent = `${currentPlayer.name} strikes
    ${calculateCellName(result.coordinates)} 
   and gets a ${result.result}`;
 
-  switch (result.result) {
-    case 'hit':
-      title.textContent = 'Hit!';
-
-    case 'miss':
-      title.textContent = 'Miss..';
+  if (result.sunk == true) {
+    title.textContent = 'Sunk!';
+    subText.textContent = `${currentPlayer.name} strikes
+   ${calculateCellName(result.coordinates)} 
+  and sinks ${opponent.name}'s ${calculateShipName(result.shipLength)}`;
   }
-      modal.showModal();
+
+  modal.showModal();
 }
 
 function calculateCellName({ x, y }) {
@@ -167,5 +308,19 @@ function calculateCellName({ x, y }) {
 }
 
 function calculateShipName(shipLength) {
-  console.log(shipLength);
+  let shipName = null;
+  switch (shipLength) {
+    case 2:
+      shipName = 'Destroyer';
+      break;
+    case 3:
+      shipName = 'Submarine';
+      break;
+    case 4:
+      shipName = 'Battleship';
+      break;
+    case 5:
+      shipName = 'Carrier';
+  }
+  return shipName;
 }

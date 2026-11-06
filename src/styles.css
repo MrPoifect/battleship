@@ -3,6 +3,7 @@ body {
   margin: 0;
   padding: 0;
   height: 100%;
+  background-color: rgb(78, 87, 92);
 }
 
 #game-area {
@@ -10,17 +11,18 @@ body {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  align-content: center;
+  align-items: center;
 }
 
 .game-board {
-  align-self: center;
+  grid-area: board;
+
   display: grid;
   grid-template-columns: repeat(10, 40px);
   grid-template-rows: repeat(10, 40px);
   gap: 2px;
   width: max-content;
-  margin-bottom: 25px;
+  margin: 0;
 }
 
 .cell {
@@ -46,6 +48,52 @@ body {
 
 .cell.miss {
   background-color: #d8e3e9;
+}
+
+.board-container {
+  padding: 0px;
+  padding-right: 14px;
+  padding-bottom: 14px;
+  padding-top: 4px;
+  background-color: rgb(105, 112, 119);
+  border-radius: 6px;
+  display: grid;
+  grid-template-columns: 30px auto;
+  grid-template-rows: 30px auto;
+  grid-template-areas:
+    '. columns'
+    'rows board';
+
+  justify-content: center;
+  align-content: center;
+
+  width: fit-content;
+  margin: 0 auto 25px;
+}
+.column-labels {
+  grid-area: columns;
+
+  display: grid;
+  grid-template-columns: repeat(10, 40px);
+  gap: 2px;
+}
+
+.row-labels {
+  grid-area: rows;
+
+  display: grid;
+  grid-template-rows: repeat(10, 40px);
+  gap: 2px;
+}
+.column-labels div,
+.row-labels div {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  color: #d8e3e9;
+  font-weight: bold;
+  font-size: 18px;
 }
 
 #main-menu {
@@ -93,4 +141,9 @@ body {
   align-items: center;
   background-color: pink;
   margin: 0px;
+}
+
+#game-over-container {
+  display: flex;
+  flex-direction: row;
 }

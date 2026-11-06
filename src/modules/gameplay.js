@@ -7,7 +7,7 @@ import {
   createGameArea,
   createGameOverModal,
   createTurnOverModal,
-  calculateCellName,
+  calculateCellName
 } from './dom.js';
 
 export { Gameplay };
@@ -60,9 +60,10 @@ function Gameplay() {
       currentPlayer = playerOne;
     }
     renderBoards();
+    console.log('Swapping');
   }
 
-  function renderBoards() {
+  function renderBoards(isGameOver = false) {
     const opponent = currentPlayer === playerOne ? playerTwo : playerOne;
 
     renderPlayerBoard(currentPlayer);
@@ -83,18 +84,20 @@ function Gameplay() {
   }
 
   function handleTurnEnd(result) {
+    const opponent = currentPlayer === playerOne ? playerTwo : playerOne;
     if (result.result == 'invalid') {
       console.log('Invalid Attack');
       return;
     }
     if (result.gameOver == true) {
-      createGameOverModal(currentPlayer);
+      console.log('game-over');
+
+      createGameOverModal(currentPlayer, opponent);
       return;
     } else {
-      createTurnOverModal(currentPlayer, result)
+      createTurnOverModal(currentPlayer, result, opponent, swapPlayer);
       return;
     }
-
   }
 
   return { newPvpGame, swapPlayer, attack, handleTurnEnd };
@@ -103,11 +106,11 @@ function Gameplay() {
 function randomPlaceShips(player) {
   const board = player.board;
 
-  const carrier = Ship(5);
-  const battleship = Ship(4);
-  const submarine = Ship(3);
-  const cruiser = Ship(3);
-  const tugBoat = Ship(2);
+  const carrier = Ship(1);
+  const battleship = Ship(1);
+  const submarine = Ship(1);
+  const cruiser = Ship(1);
+  const tugBoat = Ship(1);
   const directions = ['x', 'y'];
 
   const shipsArray = [];
@@ -115,27 +118,29 @@ function randomPlaceShips(player) {
 
   const maxRetries = 100;
 
-  for (const ship of shipsArray) {
-    let placed = false;
-    let attempts = 0;
-    while (!placed && attempts < maxRetries) {
-      attempts++;
-      let randomDirection =
-        directions[Math.floor(Math.random() * directions.length)];
+  // for (const ship of shipsArray) {
+  //   let placed = false;
+  //   let attempts = 0;
+  //   while (!placed && attempts < maxRetries) {
+  //     attempts++;
+  //     let randomDirection =
+  //       directions[Math.floor(Math.random() * directions.length)];
 
-      const length = ship.getLength();
+  //     const length = ship.getLength();
 
-      let randomX;
-      let randomY;
-      if (randomDirection === 'x') {
-        randomX = Math.floor(Math.random() * (10 - length + 1));
-        randomY = Math.floor(Math.random() * 10);
-      } else {
-        randomY = Math.floor(Math.random() * (10 - length + 1));
-        randomX = Math.floor(Math.random() * 10);
-      }
+  //     let randomX;
+  //     let randomY;
+  //     if (randomDirection === 'x') {
+  //       randomX = Math.floor(Math.random() * (10 - length + 1));
+  //       randomY = Math.floor(Math.random() * 10);
+  //     } else {
+  //       randomY = Math.floor(Math.random() * (10 - length + 1));
+  //       randomX = Math.floor(Math.random() * 10);
+  //     }
 
-      placed = board.placeShip(ship, randomX, randomY, randomDirection);
-    }
-  }
+  //     placed = board.placeShip(ship, randomX, randomY, randomDirection);
+  //   }
+  // }
+
+  board.placeShip(submarine, 0, 0, 'x');
 }
