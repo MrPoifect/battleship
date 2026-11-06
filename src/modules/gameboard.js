@@ -1,5 +1,9 @@
 export { Gameboard };
 
+import { createTurnOverModal } from './dom.js';
+
+import { Gameplay } from './gameplay.js';
+
 function Gameboard() {
   const board = Array(10)
     .fill(null)
@@ -20,7 +24,7 @@ function Gameboard() {
         newY >= 10 ||
         board[newY][newX] != null
       ) {
-        console.log("invalid placement")
+        console.log('invalid placement');
         return false;
       }
     }
@@ -39,18 +43,41 @@ function Gameboard() {
   const receiveAttack = (x, y) => {
     const target = board[y][x];
     if (target === 'miss' || target === 'hit') {
-      console.log("Can't place");
-      return;
+      return {
+        result: 'invalid',
+        sunk: false,
+        shipLength: null,
+        coordinates: { x, y },
+        gameOver: false
+      };
     }
 
     if (target != null) {
       target.hit();
+
+      const targetSunk = target.isSunk();
+      const targetLength = target.getLength();
+
       board[y][x] = 'hit';
-      checkGameOver();
-      return 'hit';
+
+      const gameOver = checkGameOver();
+      return {
+        result: 'hit',
+        sunk: targetSunk,
+        shipLength: targetLength,
+        coordinates: { x, y },
+        gameOver: gameOver
+      };
     } else {
       board[y][x] = 'miss';
-      return 'miss';
+      const gameOver = checkGameOver();
+      return {
+        result: 'miss',
+        sunk: false,
+        shipLength: null,
+        coordinates: { x, y },
+        gameOver: false
+      };
     }
   };
 
@@ -62,12 +89,12 @@ function Gameboard() {
       } else {
         deadShipCount++;
         if (deadShipCount >= placedShips.length) {
-          console.log("Gameover")
           return true;
         }
       }
     }
   };
 
-  return { placeShip, board, receiveAttack, checkGameOver };
+
+  return { placeShip, board, receiveAttack, checkGameOver,};
 }

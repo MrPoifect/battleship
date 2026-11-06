@@ -2,9 +2,18 @@ import "./styles.css"
 
 import { Gameplay } from "./modules/gameplay.js"
 
-function startGame() {
+import { createMainMenu } from "./modules/dom.js";
+
+function startPvpGame(p1name, p2name) {
     const game = Gameplay();
-    game.newGame();
+    game.newPvpGame(p1name, p2name);
 }
 
-startGame();
+function startPveGame(p1name) {
+    const game = Gameplay();
+    game.newPveGame();
+}
+
+//createMainMenu();
+
+startPvpGame("Joe", "Charlotte");

@@ -1,7 +1,14 @@
 import { Player } from './player.js';
 import { Ship } from './ship.js';
 import { Gameboard } from './gameboard.js';
-import { renderPlayerBoard, renderTargetBoard, createGameArea } from './dom.js';
+import {
+  renderPlayerBoard,
+  renderTargetBoard,
+  createGameArea,
+  createGameOverModal,
+  createTurnOverModal,
+  calculateCellName,
+} from './dom.js';
 
 export { Gameplay };
 
@@ -9,17 +16,41 @@ function Gameplay() {
   let playerOne = null;
   let playerTwo = null;
   let currentPlayer = null;
-  function newGame() {
-    playerOne = Player('TestP1', 1);
+  function newPvpGame(p1name, p2name) {
+    if (p1name == null) {
+      p1name = 'Player One';
+    }
+    if (p2name == null) {
+      p2name = 'Player Two';
+    }
+    playerOne = Player(p1name, 1);
     randomPlaceShips(playerOne);
 
-    playerTwo = Player('TestP2', 2);
-    placeTempShips2(playerTwo);
+    playerTwo = Player(p2name, 2);
+    randomPlaceShips(playerTwo);
 
     createGameArea(swapPlayer);
 
     currentPlayer = playerOne;
     renderBoards();
+  }
+
+  function createPveLobby(p1name, p2name) {
+    if (p1name === null) {
+      p1name = 'Player One';
+    }
+    playerOne = Player(p1name, 1);
+
+    playerTwo = Player('Computer', 2);
+
+    createGameArea(swapPlayer);
+
+    currentPlayer = playerOne;
+    renderBoards();
+  }
+
+  function startPveGame() {
+    randomPlaceShips(playerTwo);
   }
 
   function swapPlayer() {
@@ -48,23 +79,25 @@ function Gameplay() {
     const result = opponent.board.receiveAttack(x, y);
 
     renderBoards();
+    handleTurnEnd(result);
   }
 
-  function placeTempShips(player) {
-    const shipA = Ship(4);
-    const shipB = Ship(6);
-    player.board.placeShip(shipA, 0, 0, 'x');
-    player.board.placeShip(shipB, 0, 2, 'y');
+  function handleTurnEnd(result) {
+    if (result.result == 'invalid') {
+      console.log('Invalid Attack');
+      return;
+    }
+    if (result.gameOver == true) {
+      createGameOverModal(currentPlayer);
+      return;
+    } else {
+      createTurnOverModal(currentPlayer, result)
+      return;
+    }
+
   }
 
-  function placeTempShips2(player) {
-    const shipA = Ship(4);
-    const shipB = Ship(6);
-    player.board.placeShip(shipA, 4, 0, 'x');
-    player.board.placeShip(shipB, 4, 2, 'y');
-  }
-
-  return { newGame, swapPlayer, attack };
+  return { newPvpGame, swapPlayer, attack, handleTurnEnd };
 }
 
 function randomPlaceShips(player) {
