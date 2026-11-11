@@ -12,6 +12,7 @@ body {
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  height: 100%;
 }
 
 .game-board {
@@ -50,6 +51,73 @@ body {
   background-color: #d8e3e9;
 }
 
+.cell.preview {
+  background-color: rgb(49, 52, 54);
+}
+
+.cell.invalid-preview {
+  background-color: rgb(58, 35, 35);
+}
+
+#bottom-area{
+background-color: green;
+padding: 4px;
+border-radius: 8px;
+display: flex;
+flex-direction: row;
+}
+
+#btn-area{
+  display: flex;
+  flex-direction: column-reverse;
+  justify-content: space-between;
+}
+
+#select-area {
+  background-color: pink;
+  width: 50%;
+  min-height: 330px;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 0px;
+}
+
+#select-area > div > p {
+  text-align: center;
+  font-size: 18px;
+}
+
+.ship-container {
+  background-color: rgb(143, 143, 143);
+  border-radius: 8px;
+border: none;
+  display: flex;
+  flex-direction: column;
+  margin-top: 14px;
+  padding: 5px;
+  margin: 8px;
+}
+
+.ship-container.selected {
+  box-shadow: inset 0px 0px 0px 2px rgb(255, 255, 255);
+}
+.ship-container > p {
+  text-align: start;
+  margin: 0px;
+}
+
+.cell-container {
+  display: flex;
+  flex-direction: row;
+  gap: 3px;
+}
+
+.cell.selection {
+  width: 20px;
+  height: 20px;
+}
+
 .board-container {
   padding: 0px;
   padding-right: 14px;
@@ -70,6 +138,7 @@ body {
   width: fit-content;
   margin: 0 auto 25px;
 }
+
 .column-labels {
   grid-area: columns;
 
@@ -148,9 +217,7 @@ body {
   flex-direction: row;
 }
 
-
 .modal::backdrop {
-
   backdrop-filter: blur(2px);
   -webkit-backdrop-filter: blur(2px);
 }

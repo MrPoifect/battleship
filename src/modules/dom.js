@@ -1,7 +1,7 @@
 import { Ship } from './ship.js';
 import { Gameboard } from './gameboard.js';
 import { Player } from './player.js';
-import { Gameplay } from './gameplay.js';
+import { Gameplay, placePlayerShip } from './gameplay.js';
 import { startPvpGame } from '../index.js';
 
 export {
@@ -12,7 +12,8 @@ export {
   createGameOverModal,
   createTurnOverModal,
   calculateCellName,
-  createPlayerInputs
+  createPlayerInputs,
+  renderPlacementBoard
 };
 
 function createGameArea(onSwapPlayer) {
@@ -26,12 +27,6 @@ function createGameArea(onSwapPlayer) {
   document.body.appendChild(boardArea);
 
   boardArea.append(targetBoard, playerBoard);
-
-  // const testPlayerSwitch = document.createElement('button');
-  // testPlayerSwitch.textContent = 'Swap Player';
-  // testPlayerSwitch.addEventListener('click', onSwapPlayer);
-
-  // boardArea.appendChild(testPlayerSwitch);
 }
 
 function createBoardLabels(container) {
@@ -154,6 +149,246 @@ function renderEmptyBoard(container) {
 
   // Append wrapper to container
   container.appendChild(boardContainer);
+}
+
+function renderPlacementBoard(player, renderboards) {
+    let placedShipCount = 0
+  let selectedShip = null;
+  let selectedDirection = 'x';
+  let selectedButton = null;
+  let hoveredCell = null;
+  const container = document.querySelector('#player-board');
+  container.replaceChildren();
+
+  // Create wrapper
+  const boardContainer = document.createElement('div');
+  boardContainer.classList.add('board-container', 'placement');
+
+  // Create actual game board
+  const boardElement = document.createElement('div');
+  boardElement.classList.add('game-board', 'placement');
+
+  boardElement.addEventListener('mouseleave', () => {
+    hoveredCell = null;
+
+    boardElement.querySelectorAll('.cell').forEach((cell) => {
+      cell.classList.remove('preview', 'invalid-preview');
+    });
+  });
+  // Generate labels inside wrapper
+  createBoardLabels(boardContainer);
+
+  // Generate empty cells
+  for (let y = 0; y < 10; y++) {
+    for (let x = 0; x < 10; x++) {
+      const cell = document.createElement('div');
+
+      cell.classList.add('cell');
+
+      boardElement.appendChild(cell);
+      cell.dataset.x = x;
+      cell.dataset.y = y;
+      cell.addEventListener('click', () => {
+        if (!selectedShip) return;
+
+        const valid = previewShip(x, y);
+        if (!valid) return;
+
+        const placed = placePlayerShip(
+          player,
+          selectedShip.name,
+          selectedShip.length,
+          x,
+          y,
+          selectedDirection
+        );
+        if (!placed) return;
+        selectedButton.remove();
+        placedShipCount++
+
+        for (let i = 0; i < selectedShip.length; i++) {
+          const cellX = selectedDirection === 'x' ? x + i : x;
+          const cellY = selectedDirection === 'y' ? y + i : y;
+
+          const cell = boardElement.querySelector(
+            `[data-x="${cellX}"][data-y="${cellY}"]`
+          );
+
+          cell.classList.add('ship');
+        }
+
+        selectedShip = null;
+        selectedButton = null;
+      });
+      cell.addEventListener('mouseenter', () => {
+        hoveredCell = { x, y };
+        previewShip(x, y);
+      });
+
+      cell.addEventListener('mouseleave', () => {
+        cell.classList.remove('preview', 'invalid-preview');
+      });
+    }
+  }
+
+  // Append board to wrapper
+  boardContainer.appendChild(boardElement);
+
+  // Append wrapper to container
+  container.appendChild(boardContainer);
+  renderShipSelect(
+    container,
+    (ship, button) => {
+      selectedShip = ship;
+      selectedButton = button;
+    },
+    rotateShip,
+    renderboards,
+    getPlacedShipCount
+  );
+
+  function previewShip(x, y) {
+    if (!selectedShip) return false;
+    // Clear previous preview
+    boardElement.querySelectorAll('.cell').forEach((cell) => {
+      cell.classList.remove('preview', 'invalid-preview');
+    });
+
+    if (!selectedShip) return;
+
+    const length = selectedShip.length;
+    const previewCells = [];
+    let valid = true;
+
+    for (let i = 0; i < length; i++) {
+      // Calculate position based on direction
+      const cellX = selectedDirection === 'x' ? x + i : x;
+      const cellY = selectedDirection === 'y' ? y + i : y;
+
+      // Check boundaries
+      if (cellX >= 10 || cellY >= 10) {
+        valid = false;
+        continue;
+      }
+
+      // Check whether cell is occupied
+      if (player.board.board[cellY][cellX] !== null) {
+        valid = false;
+      }
+
+      const cell = boardElement.querySelector(
+        `[data-x="${cellX}"][data-y="${cellY}"]`
+      );
+
+      if (cell) {
+        previewCells.push(cell);
+      }
+    }
+
+    // Highlight all preview cells
+    previewCells.forEach((cell) => {
+      cell.classList.add(valid ? 'preview' : 'invalid-preview');
+    });
+
+    return valid;
+  }
+  function rotateShip() {
+    selectedDirection = selectedDirection === 'x' ? 'y' : 'x';
+
+    if (hoveredCell && selectedShip) {
+      previewShip(hoveredCell.x, hoveredCell.y);
+    }
+  }
+  
+  function getPlacedShipCount() {
+    return placedShipCount;
+  }
+
+  return { rotateShip };
+}
+
+function renderShipSelect(container, onSelectShip, onRotateShip, onRenderBoards, onGetPlacedShipCount) {
+
+  const bottomArea = document.createElement('div');
+  const selectArea = document.createElement('div');
+  selectArea.id = 'select-area';
+  bottomArea.id = 'bottom-area';
+
+  container.appendChild(bottomArea);
+  bottomArea.appendChild(selectArea);
+
+  const titleArea = document.createElement('div');
+  const title = document.createElement('p');
+  title.textContent = 'Select a ship';
+
+  selectArea.appendChild(titleArea);
+  titleArea.appendChild(title);
+
+  const shipArea = document.createElement('div');
+
+  selectArea.appendChild(shipArea);
+
+  const shipsArray = [
+    { name: 'Carrier', length: 5 },
+    { name: 'Battleship', length: 4 },
+    { name: 'Submarine', length: 3 },
+    { name: 'Cruiser', length: 2 },
+    { name: 'Destroyer', length: 2 }
+  ];
+
+  let selectedShip = null;
+
+  for (const ship of shipsArray) {
+    const shipContainer = document.createElement('button');
+    shipContainer.type = 'button';
+    shipContainer.dataset.shipName = ship.name;
+    shipContainer.classList.add('selection', 'ship-container');
+    const shipName = document.createElement('p');
+    shipName.textContent = ship.name;
+    const shipCellContainer = document.createElement('div');
+    shipCellContainer.classList.add('cell-container');
+
+    shipArea.appendChild(shipContainer);
+    shipContainer.append(shipName, shipCellContainer);
+
+    for (let i = 0; i < ship.length; i++) {
+      const cell = document.createElement('div');
+      cell.classList.add('cell', 'selection');
+      shipCellContainer.appendChild(cell);
+    }
+    shipContainer.addEventListener('click', () => {
+      document
+        .querySelectorAll('.ship-container')
+        .forEach((button) => button.classList.remove('selected'));
+
+      shipContainer.classList.add('selected');
+
+      selectedShip = ship;
+
+      onSelectShip(selectedShip, shipContainer);
+    });
+  }
+
+  const buttonArea = document.createElement('div');
+  buttonArea.id = 'btn-area';
+  bottomArea.appendChild(buttonArea);
+
+  const readyBtn = document.createElement('button');
+  buttonArea.appendChild(readyBtn);
+  readyBtn.textContent = 'Start Test';
+
+  readyBtn.addEventListener('click', () => {
+    if (onGetPlacedShipCount() >= shipsArray.length) {
+    onRenderBoards();}
+    else {console.log("Place all ships" + onGetPlacedShipCount())}
+  });
+
+  const rotateButton = document.createElement('button');
+  rotateButton.textContent = 'Rotate Ship (R)';
+
+  rotateButton.addEventListener('click', onRotateShip);
+
+  buttonArea.appendChild(rotateButton);
 }
 
 function createMainMenu() {

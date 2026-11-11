@@ -7,10 +7,11 @@ import {
   createGameArea,
   createGameOverModal,
   createTurnOverModal,
-  calculateCellName
+  calculateCellName,
+  renderPlacementBoard
 } from './dom.js';
 
-export { Gameplay };
+export { Gameplay, placePlayerShip };
 
 function Gameplay() {
   let playerOne = null;
@@ -24,15 +25,14 @@ function Gameplay() {
       p2name = 'Player Two';
     }
     playerOne = Player(p1name, 1);
-    randomPlaceShips(playerOne);
 
     playerTwo = Player(p2name, 2);
-    randomPlaceShips(playerTwo);
-
-    createGameArea(swapPlayer);
 
     currentPlayer = playerOne;
-    renderBoards();
+    createGameArea(swapPlayer)
+    renderPlacementBoard(playerOne, renderBoards)
+
+    // renderBoards();
   }
 
   function createPveLobby(p1name, p2name) {
@@ -145,3 +145,14 @@ function randomPlaceShips(player) {
   board.placeShip(submarine, 0, 0, 'x');
   board.placeShip(destroyer, 9, 9, 'y');
 }
+
+function placePlayerShip(player, shipName, shipLength, x, y, direction) {
+  const board = player.board;
+
+  const ship = Ship(shipLength, shipName);
+
+  board.placeShip(ship, x, y, direction)
+  return true;
+}
+
+
