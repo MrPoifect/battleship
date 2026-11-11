@@ -151,8 +151,8 @@ function renderEmptyBoard(container) {
   container.appendChild(boardContainer);
 }
 
-function renderPlacementBoard(player, renderboards) {
-    let placedShipCount = 0
+function renderPlacementBoard(player, renderboards, player2, isPlayer2 = false) {
+  let placedShipCount = 0;
   let selectedShip = null;
   let selectedDirection = 'x';
   let selectedButton = null;
@@ -204,7 +204,7 @@ function renderPlacementBoard(player, renderboards) {
         );
         if (!placed) return;
         selectedButton.remove();
-        placedShipCount++
+        placedShipCount++;
 
         for (let i = 0; i < selectedShip.length; i++) {
           const cellX = selectedDirection === 'x' ? x + i : x;
@@ -244,7 +244,9 @@ function renderPlacementBoard(player, renderboards) {
     },
     rotateShip,
     renderboards,
-    getPlacedShipCount
+    getPlacedShipCount,
+    player2,
+    isPlayer2,
   );
 
   function previewShip(x, y) {
@@ -299,16 +301,21 @@ function renderPlacementBoard(player, renderboards) {
       previewShip(hoveredCell.x, hoveredCell.y);
     }
   }
-  
+
   function getPlacedShipCount() {
     return placedShipCount;
   }
-
-  return { rotateShip };
 }
 
-function renderShipSelect(container, onSelectShip, onRotateShip, onRenderBoards, onGetPlacedShipCount) {
-
+function renderShipSelect(
+  container,
+  onSelectShip,
+  onRotateShip,
+  onRenderBoards,
+  onGetPlacedShipCount,
+  player2,
+  isPlayer2 = false,
+) {
   const bottomArea = document.createElement('div');
   const selectArea = document.createElement('div');
   selectArea.id = 'select-area';
@@ -379,8 +386,12 @@ function renderShipSelect(container, onSelectShip, onRotateShip, onRenderBoards,
 
   readyBtn.addEventListener('click', () => {
     if (onGetPlacedShipCount() >= shipsArray.length) {
-    onRenderBoards();}
-    else {console.log("Place all ships" + onGetPlacedShipCount())}
+      if (!isPlayer2) {
+        renderPlacementBoard(player2, onRenderBoards, player2, true )
+      } else {
+        onRenderBoards();
+      }
+    }
   });
 
   const rotateButton = document.createElement('button');

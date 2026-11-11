@@ -17,6 +17,8 @@ function Gameplay() {
   let playerOne = null;
   let playerTwo = null;
   let currentPlayer = null;
+
+
   function newPvpGame(p1name, p2name) {
     if (p1name == null) {
       p1name = 'Player One';
@@ -30,7 +32,7 @@ function Gameplay() {
 
     currentPlayer = playerOne;
     createGameArea(swapPlayer)
-    renderPlacementBoard(playerOne, renderBoards)
+    renderPlacementBoard(playerOne, renderBoards, playerTwo)
 
     // renderBoards();
   }
