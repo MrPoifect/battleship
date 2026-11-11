@@ -106,15 +106,15 @@ function Gameplay() {
 function randomPlaceShips(player) {
   const board = player.board;
 
-  const carrier = Ship(1);
-  const battleship = Ship(1);
-  const submarine = Ship(1);
-  const cruiser = Ship(1);
-  const tugBoat = Ship(1);
+  const carrier = Ship(1, 'Carrier');
+  const battleship = Ship(1, 'Battleship');
+  const submarine = Ship(2, 'Submarine');
+  const cruiser = Ship(1, 'Cruiser');
+  const destroyer = Ship(1, 'Destroyer');
   const directions = ['x', 'y'];
 
   const shipsArray = [];
-  shipsArray.push(carrier, battleship, submarine, cruiser, tugBoat);
+  shipsArray.push(carrier, battleship, submarine, cruiser, destroyer);
 
   const maxRetries = 100;
 
@@ -143,4 +143,5 @@ function randomPlaceShips(player) {
   // }
 
   board.placeShip(submarine, 0, 0, 'x');
+  board.placeShip(destroyer, 9, 9, 'y');
 }

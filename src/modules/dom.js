@@ -40,7 +40,7 @@ function createBoardLabels(container) {
   const columnLabels = document.createElement('div');
   columnLabels.classList.add('column-labels');
 
-  letters.forEach(letter => {
+  letters.forEach((letter) => {
     const label = document.createElement('div');
     label.textContent = letter;
     columnLabels.appendChild(label);
@@ -126,17 +126,34 @@ function renderTransitionBoards() {
 
 function renderEmptyBoard(container) {
   container.replaceChildren();
-  container.classList.add('game-board');
 
+  // Create wrapper
+  const boardContainer = document.createElement('div');
+  boardContainer.classList.add('board-container');
+
+  // Create actual game board
+  const boardElement = document.createElement('div');
+  boardElement.classList.add('game-board');
+
+  // Generate labels inside wrapper
+  createBoardLabels(boardContainer);
+
+  // Generate empty cells
   for (let y = 0; y < 10; y++) {
     for (let x = 0; x < 10; x++) {
       const cell = document.createElement('div');
 
       cell.classList.add('cell');
 
-      container.appendChild(cell);
+      boardElement.appendChild(cell);
     }
   }
+
+  // Append board to wrapper
+  boardContainer.appendChild(boardElement);
+
+  // Append wrapper to container
+  container.appendChild(boardContainer);
 }
 
 function createMainMenu() {
@@ -254,7 +271,6 @@ function createGameOverModal(currentPlayer, opponent) {
   modal.showModal();
 }
 
-
 function createTurnOverModal(currentPlayer, result, opponent, onSwapPlayer) {
   const modal = document.createElement('dialog');
   modal.id = 'turn-over';
@@ -297,7 +313,7 @@ function createTurnOverModal(currentPlayer, result, opponent, onSwapPlayer) {
     title.textContent = 'Sunk!';
     subText.textContent = `${currentPlayer.name} strikes
    ${calculateCellName(result.coordinates)} 
-  and sinks ${opponent.name}'s ${calculateShipName(result.shipLength)}`;
+  and sinks ${opponent.name}'s ${result.ship.shipName}`;
   }
 
   modal.showModal();
@@ -305,22 +321,4 @@ function createTurnOverModal(currentPlayer, result, opponent, onSwapPlayer) {
 
 function calculateCellName({ x, y }) {
   return `${String.fromCharCode(65 + x)}${y + 1}`;
-}
-
-function calculateShipName(shipLength) {
-  let shipName = null;
-  switch (shipLength) {
-    case 2:
-      shipName = 'Destroyer';
-      break;
-    case 3:
-      shipName = 'Submarine';
-      break;
-    case 4:
-      shipName = 'Battleship';
-      break;
-    case 5:
-      shipName = 'Carrier';
-  }
-  return shipName;
 }

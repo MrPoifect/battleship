@@ -48,7 +48,8 @@ function Gameboard() {
         sunk: false,
         shipLength: null,
         coordinates: { x, y },
-        gameOver: false
+        gameOver: false,
+        ship: target
       };
     }
 
@@ -66,7 +67,8 @@ function Gameboard() {
         sunk: targetSunk,
         shipLength: targetLength,
         coordinates: { x, y },
-        gameOver: gameOver
+        gameOver: gameOver,
+        ship: target
       };
     } else {
       board[y][x] = 'miss';
@@ -76,7 +78,8 @@ function Gameboard() {
         sunk: false,
         shipLength: null,
         coordinates: { x, y },
-        gameOver: false
+        gameOver: false,
+        ship: null
       };
     }
   };
@@ -95,6 +98,5 @@ function Gameboard() {
     }
   };
 
-
-  return { placeShip, board, receiveAttack, checkGameOver,};
+  return { placeShip, board, receiveAttack, checkGameOver };
 }

@@ -1,7 +1,8 @@
 export { Ship };
 
-function Ship(length) {
+function Ship(length, name) {
   const shipLength = length;
+  const shipName = name;
   let hitCount = 0;
 
   const hit = () => {
@@ -16,10 +17,10 @@ function Ship(length) {
   const getHitCount = () => {
     return hitCount;
   };
-  
-  const getLength = () => {
-    return shipLength
-  }
 
-  return { hit, isSunk, getLength, getHitCount };
+  const getLength = () => {
+    return shipLength;
+  };
+
+  return { hit, isSunk, getLength, getHitCount, shipName };
 }
